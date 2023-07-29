@@ -152,7 +152,6 @@
                 <x-input class="block mt-1 w-full" wire:model="flyer" type="file" id="flyer" />
             @endif
         </div>
-        <textarea name="asd" id="asd" cols="30" rows="10"></textarea>
 
         @if ($modifico != '')
         <div class="min-w-full my-3 py-2 text-gray-200 text-center bg-blue-800 bg-opacity-20">
@@ -188,11 +187,3 @@
         </div>
     </form>
 </div>
-
-<script>
-        tinymce.init({
-            selector: 'textarea#asd',
-            plugins: 'code table lists',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | code',
-        });
-</script>
