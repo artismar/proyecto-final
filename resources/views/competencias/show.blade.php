@@ -1,3 +1,3 @@
 <x-app-layout>
-    @livewire('competencias.ver-competencias')
+    @livewire('competencias.show')
 </x-app-layout>

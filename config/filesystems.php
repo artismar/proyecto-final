@@ -30,7 +30,7 @@ return [
 
     'disks' => [
 
-        'localphp' => [
+        'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
             'throw' => false,

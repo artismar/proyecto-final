@@ -15,9 +15,9 @@ class CompetenciasSeeder extends Seeder {
         //
         Competencia::create([
             'titulo' => 'Juegos de Integración Patagónicos',
-            'flyer' => 'competencias/flyerLiga.jpeg',
-            'bases' => 'competencias/bases/',
-            'invitacion' => 'competencias/invitacion/',
+            'flyer' => 'competencias/flyerLiga2.jpeg',
+            'bases' => 'competencias/bases/CertificadoParcial2.pdf',
+            'invitacion' => 'competencias/invitacion/Invitacion2.pdf',
             'descripcion' => 'Compe complicadisima, no se anoten',
             'fecha_inicio' => '2023-06-20',
             'fecha_fin' => '2023-06-30',
@@ -28,8 +28,8 @@ class CompetenciasSeeder extends Seeder {
             'titulo' => 'Competencia de la Liga',
             'cant_jueces' => 3,
             'flyer' => 'competencias/flyerLiga.jpeg',
-            'bases' => 'competencias/bases/',
-            'invitacion' => 'competencias/invitacion/',
+            'bases' => 'competencias/bases/CertificadoParcial.pdf',
+            'invitacion' => 'competencias/invitacion/Invitacion.pdf',
             'descripcion' => 'Competicion para todos',
             'fecha_inicio' => '2023-06-23',
             'fecha_fin' => '2023-06-30',

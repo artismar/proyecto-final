@@ -48,6 +48,7 @@ Route::group(['middleware' => ['role:Admin']], function() {
 
     // Competencias
     Route::view('/administrar-competencias', 'competencias.index')->name('competencias.administrar-competencias');
+    Route::view('/administrar-competencias/{idCompetencia}', 'competencias.edit')->name('competencias.show');
     Route::view('/inscriptos-pendientes/{idCompetencia}', 'competencias.solicitudes-inscriptos')->name('solicitudes-inscriptos');
 });
 
