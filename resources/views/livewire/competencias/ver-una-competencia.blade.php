@@ -19,7 +19,7 @@
                     <ul>
                         <li class="dark:bg-gray-800 dark:border-gray-700 rounded-md max-w-md p-2">
                             <h1 class="text-lg font-semibold">Descripción</h1>
-                            {{ $data['descripcion'] }}
+                            {!! $data['descripcion'] !!}
                         </li>
                         <li class="dark:bg-gray-800 dark:border-gray-700 rounded-md max-w-md p-2 mt-4">
                             <h1 class="text-lg font-semibold">Dia de inicio</h1>

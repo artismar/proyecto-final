@@ -10,33 +10,43 @@
         <p class="text-green-200">
             {{$estado}}
         </p>
-        <p class="text-green-500 hover:text-green-800 cursor-pointer" wire:click="cambiarEstado({{$competencia->estado}})">
-            {{$estadoProximo}}
+        @if ($competencia->estado != 5)
+        <p class="text-green-500 hover:text-green-800" wire:click="cambiarEstado({{$competencia->estado}})">
+            <span class="cursor-pointer">{{$estadoProximo}}</span>
         </p>
+        @endif
     </div>
-    <form enctype="multipart/form-data">
+    <form wire:submit.prevent="" enctype="multipart/form-data">
         <div class="py-3">
             <x-label class="text-white" for="titulo">Titulo</x-label>
             <x-input class="block mt-1 w-full" wire:model="titulo" type="text" id="titulo"/>
-            @error('titulo') <span class="error">{{ $message }}</span> @enderror
+            @error('titulo') <span class="error text-red-700">{{ $message }}</span> @enderror
         </div>
 
-        <div class="py-3">
+        <div class="py-3" wire:ignore>
             <x-label class="text-white" for="descripcion">Descripcion</x-label>
-            <x-input class="block mt-1 w-full" wire:model="descripcion" type="text" id="descripcion" />
-            @error('descripcion') <span class="error">{{ $message }}</span> @enderror
+            <div id="descripcion">{!! $descripcion !!}</div>
+            @error('descripcion') <span class="error text-red-700">{{ $message }}</span> @enderror
         </div>
 
         <div class="py-3">
             <x-label class="text-white" for="fecha_inicio">Fecha inicio</x-label>
-            <x-input class="block mt-1 w-full" wire:model="fecha_inicio" type="date" id="fecha_inicio" />
-            @error('fecha_inicio') <span class="error">{{ $message }}</span> @enderror
+            @if ($competencia->estado < 4)
+                <x-input class="block mt-1 w-full" wire:model="fecha_inicio" type="date" id="fecha_inicio" />
+            @else
+                <x-input class="block mt-1 w-full bg-gray-400" wire:model="fecha_inicio" type="date" id="fecha_inicio" disabled/>
+            @endif
+            @error('fecha_inicio') <span class="error text-red-700">{{ $message }}</span> @enderror
         </div>
 
         <div class="py-3">
             <x-label class="text-white" for="fecha_fin">Fecha fin</x-label>
-            <x-input class="block mt-1 w-full" wire:model="fecha_fin" type="date" id="fecha_fin" />
-            @error('fecha_fin') <span class="error">{{ $message }}</span> @enderror
+            @if ($competencia->estado < 5)
+                <x-input class="block mt-1 w-full" wire:model="fecha_fin" type="date" id="fecha_fin" />
+            @else
+                <x-input class="block mt-1 w-full bg-gray-400" wire:model="fecha_fin" type="date" id="fecha_fin" disabled/>
+            @endif
+            @error('fecha_fin') <span class="error text-red-700">{{ $message }}</span> @enderror
         </div class="py-3">
 
         <div class="text-gray-500 py-3">
@@ -45,14 +55,14 @@
             @if ($invitacion != '')
                 <div class="inline-flex my-2 ml-5 px-2 text-green-500 border rounded-xl">
                     <span class="pl-3">
-                        Nuevo
+                        Nuevo archivo
                     </span>
                     <span class="mx-2 hover:text-green-800 cursor-pointer" wire:click="limpiarArchivo('invitacion')" wire:key="1">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </span>
-                    @error('invitacion') <span class="error">{{ $message }}</span> @enderror
+                    @error('invitacion') <span class="error text-red-700">{{ $message }}</span> @enderror
                 </div>
             @else
                 {{-- Ver o descargar archivo subido --}}
@@ -72,8 +82,9 @@
                         </svg>
                     </span>
                 </div>
-
-                <x-input class="block mt-1 w-full" wire:model="invitacion" type="file" id="invitacion" />
+                @if ($competencia->estado == 1)
+                    <x-input class="block mt-1 w-full" wire:model="invitacion" type="file" id="invitacion" />
+                @endif
             @endif
 
         </div>
@@ -84,14 +95,14 @@
             @if ($bases != "")
                 <div class="inline-flex my-2 ml-5 px-2 text-green-500 border rounded-xl">
                     <span class="pl-3">
-                        Nuevo
+                        Nuevo archivo
                     </span>
                     <span class="mx-2 hover:text-green-800 cursor-pointer" wire:click="limpiarArchivo('bases')" wire:key="2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </span>
-                    @error('bases') <span class="error">{{ $message }}</span> @enderror
+                    @error('bases') <span class="error text-red-700">{{ $message }}</span> @enderror
                 </div>
             @else
                 {{-- Ver o descargar archivo subido --}}
@@ -105,14 +116,15 @@
                             </svg>
                         </a>
                     </span>|
-                    <span class="mx-2 hover:text-green-800 cursor-pointer" wire:click="limpiarArchivo('bases')">
+                    <span class="mx-2 hover:text-green-800 cursor-pointer" wire:click="descargarArchivo('bases')">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </span>
                 </div>
-
-                <x-input class="block mt-1 w-full" wire:model="bases" type="file" id="bases" />
+                @if ($competencia->estado == 1)
+                    <x-input class="block mt-1 w-full" wire:model="bases" type="file" id="bases" />
+                @endif
             @endif
         </div>
 
@@ -121,14 +133,14 @@
             @if ($flyer != '')
                 <div class="inline-flex my-2 ml-5 px-2 text-green-500 border rounded-xl">
                     <span class="pl-3">
-                        Nuevo
+                        Nuevo archivo
                     </span>
                     <span class="mx-2 hover:text-green-800 cursor-pointer" wire:click="limpiarArchivo('flyer')" wire:key="3">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </span>
-                    @error('flyer') <span class="error">{{ $message }}</span> @enderror
+                    @error('flyer') <span class="error text-red-700">{{ $message }}</span> @enderror
                 </div>
             @else
                 {{-- Ver o descargar archivo subido --}}
@@ -148,8 +160,7 @@
                         </svg>
                     </span>
                 </div>
-
-                <x-input class="block mt-1 w-full" wire:model="flyer" type="file" id="flyer" />
+                    <x-input class="block mt-1 w-full" wire:model="flyer" type="file" id="flyer" />
             @endif
         </div>
 
@@ -179,7 +190,7 @@
                         {{ __('Guardar') }}
                     </x-button>
                 @else
-                    <x-button type="submit" class="bg-green-800 hover:bg-green-700 ml-2">
+                    <x-button type="submit" class="bg-green-800 hover:bg-green-700 ml-2" wire:click="save()">
                         {{ __('Guardar') }}
                     </x-button>
                 @endif
@@ -187,3 +198,18 @@
         </div>
     </form>
 </div>
+
+<script>
+    let editor
+    ClassicEditor
+        .create( document.querySelector( '#descripcion' ) )
+        .then(function(leditor){
+            editor = leditor;
+            leditor.model.document.on('change:data', () => {
+                @this.set('descripcion', leditor.getData());
+            })
+        })
+        .catch( error => {
+            console.error( error );
+        } );
+</script>

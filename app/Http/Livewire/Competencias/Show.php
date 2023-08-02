@@ -18,7 +18,6 @@ class Show extends Component {
     public $msj;
     public $titulo, $flyer, $bases, $descripcion, $invitacion, $fecha_inicio, $fecha_fin, $estado, $estadoProximo; //variables para el manejo de los datos del form
 
-
     protected $listeners = ['render'=>'render'];
 
 
@@ -30,49 +29,36 @@ class Show extends Component {
 
         // Validamos que el nuevo dato sea diferente al actual para cambiarlo.
         if ($this->titulo != $competencia->titulo){
-            // $competencia->titulo = $this->titulo;
             $seModifico = true;
             $datosModificados[] = 'titulo';
         }
 
         if ($this->descripcion != $competencia->descripcion){
-            // $competencia->descripcion = $this->descripcion;
             $seModifico = true;
             $datosModificados[] = 'descripcion';
         }
 
         if ($this->fecha_inicio != $competencia->fecha_inicio){
-            // $competencia->fecha_inicio = $this->fecha_inicio;
             $seModifico = true;
             $datosModificados[] = 'fecha inicio';
         }
 
         if ($this->fecha_fin != $competencia->fecha_fin){
-            // $competencia->fecha_fin = $this->fecha_fin;
             $seModifico = true;
             $datosModificados[] = 'fecha fin';
         }
 
-        if ($this->invitacion != null){
-            // Storage::disk('public')->delete($competencia->invitacion);
-            $urlInvitacion = $this->invitacion->store('competencias/invitacion', 'public');
-            // $competencia->invitacion = $urlInvitacion;
+        if ($this->invitacion != null && $this->invitacion != ''){
             $seModifico = true;
             $datosModificados[] = 'invitacion';
         }
 
         if ($this->bases != null && $this->bases != ''){
-            // Storage::disk('public')->delete($competencia->bases);
-            $urlBases = $this->bases->store('competencias/bases', 'public');
-            // $competencia->bases = $urlBases;
             $seModifico = true;
             $datosModificados[] = 'bases';
         }
 
-        if ($this->flyer != null){
-            // Storage::disk('public')->delete($competencia->flyer);
-            $urlImagen = $this->flyer->store('competencias', 'public');
-            // $competencia->flyer = $urlImagen;
+        if ($this->flyer != null && $this->flyer != ''){
             $seModifico = true;
             $datosModificados[] = 'flyer';
         }
@@ -87,8 +73,8 @@ class Show extends Component {
             }
             $msj = "$items";
         }
-
         $this->estados();
+        $this->emit('editorActualizado');
         return view('livewire.competencias.edit', ['competencia' => $this->competencia, 'campos' => $msj, 'modifico' => $seModifico]);
     }
 
@@ -149,7 +135,7 @@ class Show extends Component {
         } elseif ($file == 'bases') {
             $this->bases = '';
         } else {
-            $this->invitacion = '';
+            $this->flyer = '';
         }
         $this->render();
     }
@@ -157,22 +143,38 @@ class Show extends Component {
     public function cambiarEstado($estadoActual){
         if ($this->competencia->estado < 5 && $this->competencia->estado >= 0){
             $this->competencia->estado++;
-        } elseif ($this->competencia->estado == 5){
-            $this->competencia->estado = 0;
+            if ($this->competencia->estado == 4){
+                $this->ActualizarFecha('inicio');
+            } elseif($this->competencia->estado == 5){
+                $this->ActualizarFecha('fin');
+            }
         }
         $this->competencia->save();
         $this->render();
+    }
+
+    public function ActualizarFecha($tipo){
+        $today = date('Y-m-d');
+        if ($tipo == 'inicio'){
+            $this->competencia->fecha_inicio = $today;
+            $this->fecha_inicio = $today;
+        } else{
+            $this->competencia->fecha_fin = $today;
+            $this->fecha_fin = $today;
+        }
+        $this->competencia->save();
     }
 
     public function volver(){
         return to_route('competencias.administrar-competencias');
     }
 
-    public function update()
+    public function save()
     {
+        $competencia = $this->competencia;
         $this->validate([
             'titulo' => ['required', 'max:120', 'unique:competencias,titulo,' . $this->competencia->id],
-            'descripcion' => ['required', 'max:120'],
+            'descripcion' => ['nullable'],
             'fecha_inicio' => ['required', 'date', 'after_or_equal:today', 'before:fecha_fin'],
             'fecha_fin' => ['required', 'date', 'after:fecha_inicio'],
             'bases' => ['nullable', 'mimes:pdf,docx'],
@@ -180,15 +182,50 @@ class Show extends Component {
             'invitacion' => ['nullable', 'mimes:pdf,docx'],
         ]);
 
-        // Lógica para guardar los cambios en la base de datos o hacer cualquier otra acción
+        // Validamos que el nuevo dato sea diferente al actual para cambiarlo.
+        if ($this->titulo != $competencia->titulo){
+            $competencia->titulo = $this->titulo;
+        }
 
-        $this->msj = 'Cambios guardados exitosamente.';
+        if ($this->descripcion != $competencia->descripcion){
+            $competencia->descripcion = $this->descripcion;
+        }
+
+        if ($this->fecha_inicio != $competencia->fecha_inicio){
+            $competencia->fecha_inicio = $this->fecha_inicio;
+        }
+
+        if ($this->fecha_fin != $competencia->fecha_fin){
+            $competencia->fecha_fin = $this->fecha_fin;
+        }
+
+        if ($this->invitacion != null && $this->invitacion != ''){
+            Storage::disk('public')->delete($competencia->invitacion);
+            $urlInvitacion = $this->invitacion->store('competencias/invitacion', 'public');
+            $competencia->invitacion = $urlInvitacion;
+        }
+
+        if ($this->bases != null && $this->bases != ''){
+            Storage::disk('public')->delete($competencia->bases);
+            $urlBases = $this->bases->store('competencias/bases', 'public');
+            $competencia->bases = $urlBases;
+        }
+
+        if ($this->flyer != null && $this->flyer != ''){
+            Storage::disk('public')->delete($competencia->flyer);
+            $urlImagen = $this->flyer->store('competencias', 'public');
+            $competencia->flyer = $urlImagen;
+        }
+
+        $competencia->save();
+
+        return to_route('competencias.administrar-competencias')->with('status', 'Competencia editada.');
     }
 
     public function delete($id) {
         $competencia = Competencia::find($id);
         $competencia->estado = 0;
         $competencia->save();
-        return to_route('competencias.administrar-competencias');
+        return to_route('competencias.administrar-competencias')->with('status', 'competencia eliminada');
     }
 }
